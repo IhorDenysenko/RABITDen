@@ -46,8 +46,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Collectable\Bomb\Bombs.cs" />
+     <Compile Include="Assets\Collectable\Coins\Coins.cs" />
+     <Compile Include="Assets\Collectable\Collectable.cs" />
+     <Compile Include="Assets\Collectable\Fruit\Fruits.cs" />
+     <Compile Include="Assets\Collectable\Gem\Gems.cs" />
+     <Compile Include="Assets\Collectable\Mushroom\Mushroom.cs" />
      <Compile Include="Assets\DeathHere.cs" />
      <Compile Include="Assets\LevelController.cs" />
+     <Compile Include="Assets\MovingPlatform\MovingPlatform.cs" />
      <Compile Include="Assets\ParallaxLayer.cs" />
      <Compile Include="Assets\Rabit\Scripts\CameraFollow.cs" />
      <Compile Include="Assets\Rabit\Scripts\HeroRabit.cs" />
