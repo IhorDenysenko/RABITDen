@@ -46,6 +46,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Brown Orc\Carrot\Carrot.cs" />
+     <Compile Include="Assets\Brown Orc\Scripts\BrownOrcController.cs" />
      <Compile Include="Assets\Collectable\Bomb\Bombs.cs" />
      <Compile Include="Assets\Collectable\Coins\Coins.cs" />
      <Compile Include="Assets\Collectable\Collectable.cs" />
@@ -53,6 +55,7 @@
      <Compile Include="Assets\Collectable\Gem\Gems.cs" />
      <Compile Include="Assets\Collectable\Mushroom\Mushroom.cs" />
      <Compile Include="Assets\DeathHere.cs" />
+     <Compile Include="Assets\Green Orc\Scripts\GreenOrcController.cs" />
      <Compile Include="Assets\LevelController.cs" />
      <Compile Include="Assets\MovingPlatform\MovingPlatform.cs" />
      <Compile Include="Assets\ParallaxLayer.cs" />

@@ -5,8 +5,13 @@ using UnityEngine;
 public class HeroRabit : MonoBehaviour {
 
 
+    public static HeroRabit lastRabit = null;
+
     bool isBig;
     bool dying;
+    bool respawned;
+
+    public static bool deathFromOrc;
 
     float TimeToRespawn;
 
@@ -22,12 +27,23 @@ public class HeroRabit : MonoBehaviour {
 
     Transform heroParent = null;
 
+    float jumpAfterOrcDeath;
+    Vector3 jumpAOD=new Vector3(0,5,0);
 
     Rigidbody2D myBody = null;
     public float speed = 1f;
 
+   public static bool AfterOrcDeathJump;
+
+    void Awake()
+    {
+        lastRabit = this;
+    }
+
+
     // Use this for initialization
-    void Start () {
+    void Start ()
+    {
         LevelController.current.setStartPosition(transform.position);
         myBody = this.GetComponent<Rigidbody2D>();
 
@@ -35,160 +51,202 @@ public class HeroRabit : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update () {
-		
+	void LateUpdate ()
+    {
+	
+        if(deathFromOrc)
+        {
+            deathFromOrc = false;
+            respawned = true;
+            StartCoroutine(DieFromOrc(1.7f));
+           
+        }
+
+
+        if(AfterOrcDeathJump)
+        {
+            AfterOrcDeathJump = false;
+            jumpAfterOrcDeath = 0.3f;
+        }
+
+
+        if (jumpAfterOrcDeath > 0)
+        {
+            jumpAfterOrcDeath -= Time.deltaTime;
+            this.transform.position += jumpAOD * Time.deltaTime;
+        }
 	}
+
+    IEnumerator DieFromOrc(float duration)
+    {
+        GetComponent<Animator>().SetBool("die",true);
+
+        yield return new WaitForSeconds(duration);
+
+        GetComponent<Animator>().SetBool("die", false);
+       
+        LevelController.current.onRabitDeath(this);
+        respawned = false;
+    }
+
+
+    IEnumerator RestoreKeys(float duration)
+    {
+        
+
+        yield return new WaitForSeconds(duration);
+        deathFromOrc = false;
+
+    }
 
 
     // Update is called once per frame
     void FixedUpdate()
     {
+        
 
-
-
-        if (tempExplosionTime>0)
-        {
-            tempExplosionTime -= Time.deltaTime;
-
-        }else if(between)
-        {
-            between = false;
-
-            SpriteRenderer sr = this.GetComponent<SpriteRenderer>();
-
-            var color = sr.color;
-
-            color.b = 255;
-            color.r = 255;
-            color.g = 255;
-
-            sr.color = color;
-
-        }
-
-
-
-
-
-
-        if (!dying)
+        if (!deathFromOrc&&!respawned)
         {
 
-
-
-            //[-1, 1]
-            float value = Input.GetAxis("Horizontal");
-            Animator animator = GetComponent<Animator>();
-
-
-            if (Mathf.Abs(value) > 0)
+            if (tempExplosionTime > 0)
             {
+                tempExplosionTime -= Time.deltaTime;
 
-                Vector2 vel = myBody.velocity;
-                vel.x = value * speed;
-                myBody.velocity = vel;
+            }
+            else if (between)
+            {
+                between = false;
+
+                SpriteRenderer sr = this.GetComponent<SpriteRenderer>();
+
+                var color = sr.color;
+
+                color.b = 255;
+                color.r = 255;
+                color.g = 255;
+
+                sr.color = color;
+
             }
 
 
-            if (isGrounded)
+            if (!dying)
+            {
+
+                //[-1, 1]
+                float value = Input.GetAxis("Horizontal");
+                Animator animator = GetComponent<Animator>();
+
+
                 if (Mathf.Abs(value) > 0)
                 {
-                    animator.SetBool("run", true);
+
+                    Vector2 vel = myBody.velocity;
+                    vel.x = value * speed;
+                    myBody.velocity = vel;
+                }
+
+
+                if (isGrounded)
+                    if (Mathf.Abs(value) > 0)
+                    {
+                        animator.SetBool("run", true);
+
+                    }
+                    else
+                    {
+                        animator.SetBool("run", false);
+                    }
+
+
+
+                SpriteRenderer sr = GetComponent<SpriteRenderer>();
+                if (value < 0)
+                {
+                    sr.flipX = true;
+
+                }
+                else if (value > 0)
+                {
+                    sr.flipX = false;
+                }
+
+
+
+                Vector3 from = transform.position + Vector3.up * 0.3f;
+                Vector3 to = transform.position + Vector3.down * 0.1f;
+                int layer_id = 1 << LayerMask.NameToLayer("Ground");
+                //Перевіряємо чи проходить лінія через Collider з шаром Ground
+                RaycastHit2D hit = Physics2D.Linecast(from, to, layer_id);
+                if (hit)
+                {
+                    isGrounded = true;
+                    if (hit.transform != null && hit.transform.GetComponent<MovingPlatform>() != null)
+                    {
+                        //Приліпаємо до платформи
+                        SetNewParent(this.transform, hit.transform);
+                    }
+
 
                 }
                 else
                 {
-                    animator.SetBool("run", false);
+                    isGrounded = false;
+                    SetNewParent(this.transform, this.heroParent);
                 }
 
 
 
-            SpriteRenderer sr = GetComponent<SpriteRenderer>();
-            if (value < 0)
-            {
-                sr.flipX = true;
-
-            }
-            else if (value > 0)
-            {
-                sr.flipX = false;
-            }
+                //Намалювати лінію (для розробника)
+                Debug.DrawLine(from, to, Color.red);
 
 
-
-            Vector3 from = transform.position + Vector3.up * 0.3f;
-            Vector3 to = transform.position + Vector3.down * 0.1f;
-            int layer_id = 1 << LayerMask.NameToLayer("Ground");
-            //Перевіряємо чи проходить лінія через Collider з шаром Ground
-            RaycastHit2D hit = Physics2D.Linecast(from, to, layer_id);
-            if (hit)
-            {
-                isGrounded = true;
-                if (hit.transform != null && hit.transform.GetComponent<MovingPlatform>() != null)
+                if (Input.GetButtonDown("Jump") && isGrounded)
                 {
-                    //Приліпаємо до платформи
-                    SetNewParent(this.transform, hit.transform);
+                    this.JumpActive = true;
                 }
-
-
-            }
-            else
-            {
-                isGrounded = false;
-                SetNewParent(this.transform, this.heroParent);
-            }
-
-
-
-            //Намалювати лінію (для розробника)
-            Debug.DrawLine(from, to, Color.red);
-
-
-            if (Input.GetButtonDown("Jump") && isGrounded)
-            {
-                this.JumpActive = true;
-            }
-            if (this.JumpActive)
-            {
-                //Якщо кнопку ще тримають
-                if (Input.GetButton("Jump"))
+                if (this.JumpActive)
                 {
-                    this.JumpTime += Time.deltaTime;
-                    if (this.JumpTime < this.MaxJumpTime)
+                    //Якщо кнопку ще тримають
+                    if (Input.GetButton("Jump"))
                     {
-                        Vector2 vel = myBody.velocity;
-                        vel.y = JumpSpeed * (1.0f - JumpTime / MaxJumpTime);
-                        myBody.velocity = vel;
+                        this.JumpTime += Time.deltaTime;
+                        if (this.JumpTime < this.MaxJumpTime)
+                        {
+                            Vector2 vel = myBody.velocity;
+                            vel.y = JumpSpeed * (1.0f - JumpTime / MaxJumpTime);
+                            myBody.velocity = vel;
+                        }
+                    }
+                    else
+                    {
+                        this.JumpActive = false;
+                        this.JumpTime = 0;
                     }
                 }
+
+
+
+                //Animator animator = GetComponent<Animator>();
+                if (this.isGrounded)
+                {
+                    animator.SetBool("jump", false);
+                }
                 else
                 {
-                    this.JumpActive = false;
-                    this.JumpTime = 0;
+                    animator.SetBool("jump", true);
                 }
             }
-
-
-
-            //Animator animator = GetComponent<Animator>();
-            if (this.isGrounded)
+            else if (TimeToRespawn > 0)
             {
-                animator.SetBool("jump", false);
+                TimeToRespawn -= Time.deltaTime;
             }
-            else
+            else if (TimeToRespawn <= 0)
             {
-                animator.SetBool("jump", true);
+                GetComponent<Animator>().SetBool("die", false);
+                dying = false;
+                LevelController.current.onRabitDeath(this);
             }
-        }
-        else if(TimeToRespawn>0)
-        {
-            TimeToRespawn -= Time.deltaTime;
-        }
-        else if(TimeToRespawn<=0)
-        {
-            GetComponent<Animator>().SetBool("die", false);
-            dying = false;
-            LevelController.current.onRabitDeath(this);
         }
     }
 
@@ -228,7 +286,7 @@ public class HeroRabit : MonoBehaviour {
 
 
         }
-        else if(tempExplosionTime<0)
+        else if(tempExplosionTime<=0)
         {
             GetComponent<Animator>().SetBool("die", true);
             dying = true;
