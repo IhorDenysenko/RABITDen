@@ -4,9 +4,14 @@ using UnityEngine;
 
 public class Gems : Collectable
 {
+
+    //1 blue, 2 green, 3 red
+
+    public int color;
+
     protected override void OnRabitHit(HeroRabit rabit)
     {
-       // Level.current.addGems(1);
+        LevelController.current.addGems(color);
         this.CollectedHide();
     }
 }
