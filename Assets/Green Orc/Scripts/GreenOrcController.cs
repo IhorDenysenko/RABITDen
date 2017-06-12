@@ -5,6 +5,10 @@ using UnityEngine;
 public class GreenOrcController : MonoBehaviour {
 
 
+
+    public AudioClip attackSound = null;
+    AudioSource attackSource = null;
+
     Vector3 rabit_pos; 
 
     Vector3 pointA;
@@ -25,6 +29,9 @@ public class GreenOrcController : MonoBehaviour {
 
     void Start ()
     {
+
+        attackSource = gameObject.AddComponent<AudioSource>();
+        attackSource.clip = attackSound;
 
         sr = GetComponent<SpriteRenderer>();
         
@@ -148,6 +155,10 @@ public class GreenOrcController : MonoBehaviour {
                 {
                     collidedWithRabit = false;
                     GetComponent<Animator>().SetTrigger("attack");
+
+                    if (SoundManager.Instance.isSoundOn())
+                        attackSource.Play();
+
                     HeroRabit.deathFromOrc = true;
                 }
                

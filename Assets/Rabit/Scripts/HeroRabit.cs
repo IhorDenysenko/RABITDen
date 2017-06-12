@@ -5,6 +5,19 @@ using UnityEngine;
 public class HeroRabit : MonoBehaviour {
 
 
+
+
+    public AudioClip walkSound = null;
+    AudioSource walkSource = null;
+    public AudioClip landSound = null;
+    AudioSource landSource = null;
+    public AudioClip dieSound = null;
+    AudioSource dieSource = null;
+
+
+
+
+
     public static HeroRabit lastRabit = null;
 
     bool isBig;
@@ -48,6 +61,17 @@ public class HeroRabit : MonoBehaviour {
         myBody = this.GetComponent<Rigidbody2D>();
 
         this.heroParent = this.transform.parent;
+
+
+
+        walkSource = gameObject.AddComponent<AudioSource>();
+        walkSource.clip = walkSound;
+
+        landSource = gameObject.AddComponent<AudioSource>();
+        landSource.clip = landSound;
+
+        dieSource = gameObject.AddComponent<AudioSource>();
+        dieSource.clip = dieSound;
     }
 	
 	// Update is called once per frame
@@ -152,10 +176,14 @@ public class HeroRabit : MonoBehaviour {
                     {
                         animator.SetBool("run", true);
 
+                        if (SoundManager.Instance.isSoundOn() && !walkSource.isPlaying)
+                            walkSource.Play();
+
                     }
                     else
                     {
                         animator.SetBool("run", false);
+                        walkSource.Stop();
                     }
 
 
@@ -180,6 +208,12 @@ public class HeroRabit : MonoBehaviour {
                 RaycastHit2D hit = Physics2D.Linecast(from, to, layer_id);
                 if (hit)
                 {
+
+                    if(!isGrounded)
+                    if (SoundManager.Instance.isSoundOn() && !landSource.isPlaying)
+                        landSource.Play();
+
+
                     isGrounded = true;
                     if (hit.transform != null && hit.transform.GetComponent<MovingPlatform>() != null)
                     {
@@ -289,6 +323,10 @@ public class HeroRabit : MonoBehaviour {
         else if(tempExplosionTime<=0)
         {
             GetComponent<Animator>().SetBool("die", true);
+
+            if (SoundManager.Instance.isSoundOn() )
+                dieSource.Play();
+
             dying = true;
             isGrounded = true;
 

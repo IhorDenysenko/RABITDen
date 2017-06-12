@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class BrownOrcController : MonoBehaviour {
 
+    public AudioClip attackSound = null;
+    AudioSource attackSource = null;
+
+
     Vector3 rabit_pos;
 
     Vector3 pointA;
@@ -31,6 +35,9 @@ public class BrownOrcController : MonoBehaviour {
 
     void Start()
     {
+
+        attackSource = gameObject.AddComponent<AudioSource>();
+        attackSource.clip = attackSound;
 
         sr = GetComponent<SpriteRenderer>();
 
@@ -120,6 +127,8 @@ public class BrownOrcController : MonoBehaviour {
                 {
                     GetComponent<Animator>().SetBool("attack", true);
 
+                    if (SoundManager.Instance.isSoundOn()&&!attackSource.isPlaying)
+                        attackSource.Play();
 
                     last_carrot = Time.time;
 

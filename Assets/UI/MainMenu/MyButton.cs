@@ -13,13 +13,5 @@ public class MyButton : MonoBehaviour
 
 
 
-    void Start()
-    {
-      signalOnClick.AddListener(this.onPlay);
-    }
-    void onPlay()
-    {
-        
-        SceneManager.LoadScene("ChooseLevel");
-    }
+   
 }

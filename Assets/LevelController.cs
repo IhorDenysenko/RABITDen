@@ -6,9 +6,18 @@ using UnityEngine.SceneManagement;
 public class LevelController : MonoBehaviour {
 
 
-    int coins=0;
+    public AudioClip music = null;
+    AudioSource musicSource = null;
 
-    int fruits;
+    AudioSource loseSource = null;
+    public AudioClip loseSound = null;
+
+
+    public GameObject losePop;
+
+    public int coins=0;
+
+    public int fruits;
     public int allFruits;
 
      int lifes=3;
@@ -36,6 +45,36 @@ public class LevelController : MonoBehaviour {
     }
 
 
+    void Start()
+    {
+        
+        musicSource = gameObject.AddComponent<AudioSource>();
+        musicSource.clip = music;
+        musicSource.loop = true;
+
+        if(MusicManager.Instance.isMusicOn())
+        musicSource.Play();
+
+        loseSource = gameObject.AddComponent<AudioSource>();
+        loseSource.clip = loseSound;
+
+    }
+    
+
+
+    public void MusicON()
+    {
+        MusicManager.Instance.setMusicOn(true);
+        musicSource.Play();
+    }
+
+    public void MusicOFF()
+    {
+        MusicManager.Instance.setMusicOn(false);
+        musicSource.Stop();
+    }
+
+
     Vector3 startingPosition;
     public void setStartPosition(Vector3 pos)
     {
@@ -53,10 +92,18 @@ public class LevelController : MonoBehaviour {
         if (lifes == 0)
         {
             leftHeart.SetActive(false);
-            SceneManager.LoadScene("ChooseLevel");
-        }
             
+            losePop.SetActive(true);
+            rabit.gameObject.SetActive(false);
+
+            if (SoundManager.Instance.isSoundOn())
+                loseSource.Play();
+
+                    }
+            
+        if(lifes != 0)
         rabit.transform.position = this.startingPosition;
+        
     }
 
 
