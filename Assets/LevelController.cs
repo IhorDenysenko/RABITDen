@@ -163,4 +163,25 @@ public class LevelController : MonoBehaviour {
 
     }
 
+
+    public void addHealth(int num)
+    {
+
+        if (lifes == 2)
+        {
+            lifes++;
+            rightHeart.SetActive(true);
+        }
+
+        if (lifes==1)
+        {
+            lifes++;
+            centerHeart.SetActive(true);
+        }
+        
+
+
+
+    }
+
 }

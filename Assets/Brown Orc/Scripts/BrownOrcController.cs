@@ -239,6 +239,8 @@ public class BrownOrcController : MonoBehaviour {
     {
 
         target.z = 0;
+        this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y,0);
+
         return Vector3.Distance(this.transform.position, target) < 0.2f;
     }
 

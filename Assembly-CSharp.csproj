@@ -53,6 +53,7 @@
      <Compile Include="Assets\Collectable\Collectable.cs" />
      <Compile Include="Assets\Collectable\Fruit\Fruits.cs" />
      <Compile Include="Assets\Collectable\Gem\Gems.cs" />
+     <Compile Include="Assets\Collectable\Health\Health.cs" />
      <Compile Include="Assets\Collectable\Mushroom\Mushroom.cs" />
      <Compile Include="Assets\DeathHere.cs" />
      <Compile Include="Assets\DoorsEndOfLevel\EndDoor.cs" />
